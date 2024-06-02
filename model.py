@@ -1,8 +1,8 @@
 import audioop
 import base64
-import datetime
 import os
 from pathlib import Path
+import sys
 import tempfile
 import wave
 import openai
@@ -12,7 +12,7 @@ from pydub import AudioSegment
 from pydub.playback import play
 import pyautogui
 from faster_whisper import WhisperModel
-import shutil
+import logging
 
 # ANSI escape codes for colors
 
@@ -26,6 +26,16 @@ RESET_COLOR = '\033[0m'
 
 openai.api_key = "sk-proj-9dd8fBkmKQtiwXXPvkbtT3BlbkFJRjglKE0ZQZmCJ0Tovvk1"
 client = OpenAI(api_key=openai.api_key)
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS2
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 def gpt_handle(query : str) -> str:
     response = client.chat.completions.create(
@@ -83,8 +93,9 @@ def take_screenshot(filepath: str) -> None:
     screenshot.save(filepath)
 
 def tts(text : str) -> None:
-    with tempfile.NamedTemporaryFile(suffix='.mp3', delete = False) as tmpfile:
+    with tempfile.NamedTemporaryFile(dir = resource_path(''), suffix='.mp3', delete = False) as tmpfile:
         speech_file_path = tmpfile.name
+        logging.info(f'Temporary speech file (AUDIO_FILE) created at: {speech_file_path}')
 
     response = openai.audio.speech.create(
         model='tts-1',
@@ -123,12 +134,14 @@ def record_audio(file_path : str, silence_treshold=1000, speech_treshold=1000, c
     speech_frames = int ( rate / chunk_size * 0.3) # 0.3 seconds of speech
 
     print("Audio capture ready")
+    logging.info('Audio Capture Ready (Listening)')
     while True:
         data = stream.read(chunk_size)
         rms = audioop.rms(data, 2)
 
         if rms > speech_treshold:
             print('Recording...')
+            logging.info('Recording Audio')
             break
     
     frames.append(data)
@@ -146,6 +159,7 @@ def record_audio(file_path : str, silence_treshold=1000, speech_treshold=1000, c
             silence_count = 0
 
     print('Stopping audio capture')
+    logging.info('Recording Completed')
 
     stream.stop_stream()
     stream.close()

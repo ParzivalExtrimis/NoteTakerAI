@@ -5,11 +5,14 @@ import sys
 from tkinter import PhotoImage
 import customtkinter as ctk
 import model
-from PIL import Image, ImageTk
+import logging
+
 
 
 def config(appearance: str = 'system', color_scheme :str = 'dark-blue', stayOnTop : bool = True, width : int = 250, height : int = 280, resizable : bool = False):
-    icon_path = os.path.join('icons', 'icon_leevai_logo_circle.ico')
+    logging.basicConfig(level=logging.DEBUG, filename="logfile", filemode="a+",
+                        format="%(asctime)-15s %(levelname)-8s %(message)s")
+    icon_path = model.resource_path(os.path.join('icons', 'icon_leevai_logo_circle.ico'))
     
     ctk.set_appearance_mode(appearance)
     ctk.set_default_color_theme(color_scheme)
@@ -56,6 +59,7 @@ def listen(audio_file):
 def transcribe(audio_file):
     user_input = model.transcribe(audio_file)
     print('Query: ', user_input)
+    logging.info(f'Query: {user_input}')
     os.remove(audio_file)  
   #  root.after(100, transcribe, root, label, audio_file)
     return user_input
@@ -63,6 +67,7 @@ def transcribe(audio_file):
 def termination_handle(user_input):
     response = model.gpt_handle(f'{user_input}. \nThe above statement is a user prompt. If you think the prompt is suggesting the program must be exited or that they have no further queries respond with QUIT else respond with CONTINUE. Only respond with one word, either QUIT or CONTINUE based on the above mentioned condition and nothing else')
     print(f'response: {response}')
+    logging.info(f'Interpreted response (QUIT command): {response}')
     if 'QUIT' in response.upper():
         
     #    root.after(100, termination_handle, root, label, user_input)
@@ -75,7 +80,7 @@ def take_screenshot(folder_path, user_input):
     model.tts(feedback)
 
     timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    screenshot_pth = os.path.join(folder_path, f"screenshot_{timestamp}.png")
+    screenshot_pth = model.resource_path(os.path.join(folder_path, f"screenshot_{timestamp}.png"))
 
     
     model.take_screenshot(screenshot_pth)
@@ -86,6 +91,7 @@ def analyze_screenshot(screenshot_pth, user_input):
     
     screenshot_text = model.analyze_image(screenshot_pth, user_input)
     print(screenshot_text)
+    logging.info(f'Screenshot content: \n{screenshot_text}')
    # root.after(100, analyze_screenshot, root, label, screenshot_pth, user_input)
     return screenshot_text
 
@@ -95,14 +101,14 @@ def screenshot_response(screenshot_pth, screenshot_text, user_input):
     if notes.split().pop(0) == 'YES':
         model.tts('Note that I will be ignoring the terminal on the screen as it is used to control the program. If you would like me to include it, please specify next time.')
 
-    if not os.path.exists('notes'):
-        os.makedirs('notes')
+    if not os.path.exists(model.resource_path('notes')):
+        os.makedirs(model.resource_path('notes'))
         # save notes
-    notes_path = os.path.join('notes', 'notes.txt')
+    notes_path = model.resource_path(os.path.join('notes', 'notes.txt'))
     with open(notes_path, 'a') as notes_file:
         notes_file.write(notes + "\n")
         
-        shutil.copyfile(notes_path, os.path.join("notes", "notes.md"))
+        shutil.copyfile(notes_path, model.resource_path(os.path.join("notes", "notes.md")))
         model.tts('Cleaning up your notes for readability... Almost there')
 
     os.remove(screenshot_pth)
@@ -110,20 +116,22 @@ def screenshot_response(screenshot_pth, screenshot_text, user_input):
     return notes
 
 def final_response(notes):
-    feedback = model.gpt_handle(f'Notes : {notes}\n Those are the notes you wrote down, tell the user you have done so in short. (No more than 50 words)')
+    feedback = model.gpt_handle(f'Notes : {notes}\n Those are the notes you wrote down, tell the user in 50 words or less about the notes taken.Keep it brief (NO MORE THAN 50 WORDS)')
     
     model.tts(feedback)
    # root.after(100, final_response, root, label, notes)  
 
 
 def main():
-    audio_file_pth = 'temp_recording.wav'
-    img_path = os.path.join('icons', 'leevai_logo_circle.png')
-    folder_path = 'images'
+    root = config()
+
+    audio_file_pth = model.resource_path('temp_recording.wav')
+    img_path = model.resource_path(os.path.join('icons', 'leevai_logo_circle.png'))
+    folder_path = model.resource_path('images')
     os.makedirs(folder_path, exist_ok=True)
     just_began = True
 
-    root = config()
+    logging.info(f'Looking for AUDIO_FILE at {audio_file_pth} \nLooking for MAIN_IMAGE at: {img_path} \nLooking for SCREENSHOT_STORAGE at: {folder_path} \n')
 
     # Create a frame
     frame = ctk.CTkFrame(master=root)
@@ -142,11 +150,11 @@ def main():
     root.update()
     user_input = transcribe(audio_file=audio_file_pth)
     
-    update_bottom_label(label, 'Finished')
-    root.update()
     is_quit = termination_handle(user_input=user_input)
 
     if is_quit:
+        update_bottom_label(label, 'Finished')
+        root.update()
         return 
     
     update_bottom_label(label, 'Let me take a look')
@@ -163,6 +171,7 @@ def main():
         root.update()
         model.tts('Sorry. I didn\'t see any text on the screen. Please try again')
         print('Could not find any text')
+        logging.info('Screenshot did not contain text. No text was found in the screenshot.')
         sys.exit()
     
 
