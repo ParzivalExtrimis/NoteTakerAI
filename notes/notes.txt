@@ -1,65 +1,47 @@
-### Notes on Visual Studio Code IDE Running Python Code
+### Visual Studio Code Screenshot - Python Code (main.py)
 
-#### Left Section (Run and Debug Panel)
-- **VARIABLES:**
-  - `win.bottom_label`: not available
-  - `icon`: not available
+#### Imports
+1. `datetime`
+2. `os`
+3. `shutil`
+4. `sys`
+5. `tkinter.PhotoImage`
+6. `customtkinter as ctk`
+7. `model`
+8. `logging`
 
-- **WATCH:** (Empty)
+#### Functions
 
-- **CALL STACK:**
-  - Running
-  - MainThread: RUNNING
-  - Thread-6: RUNNING
+1. **config()**
+   - Parameters: `appearance: str = 'system'`, `color_scheme: str = 'dark-blue'`, `stayOnTop: bool = False`
+   - Logging configuration
+   - Set appearance and color theme using `ctk`
+   - Create root window with optional "stay on top" attribute
+   - Set window title, geometry, and resizable properties
+   - Returns: `ctk.CTk` root window
 
-- **BREAKPOINTS:**
-  - Raised Exceptions
-  - Uncaught Exceptions
-  - User Uncaught Exceptions
+2. **set_main_image()**
+   - Parameters: `frame`, `path: str`
+   - Load image from `path`
+   - Create and pack `CTkLabel` with the image
 
-#### Middle Section (Code Editor)
-- **Files:**
-  - `model.py` (partially visible)
-  - `main.py` (selected, code visible)
+3. **set_bottom_label()**
+   - Parameters: `frame`, `text: str = ''`
+   - (Incomplete function definition)
 
-- **main.py (Code Snippet):**
-  ```python
-  def final_response(notes):
-      feedback = model.gpt_handle(f'Notes : {notes} \n Those are your return notes')
-      model.tts(feedback)
-      # root.after(100, final_response, root, label, notes)
-  
-  def main():
-      root = config()
-  
-      audio_file_pth = model.resource_path('temp_recording.wav')
-      img_path = model.resource_path(os.path.join('icons'), 'leew.jpg')
-      folder_path = model.resource_path('images')
-      os.makedirs(folder_path, exist_ok=True)
-      just_began = True
-  
-      logging.info(f'Looking for AUDIO_FILE at {audio_file_pth}')
-  
-      # Create a frame
-      frame = ctk.CTkFrame(master=root)
-      frame.pack(pady=20, padx=20, fill='both', expand=True)
-      set_main_image(frame, img_path)
-      label = set_bottom_label(frame, 'Getting ready')
-      root.update()
-  
-      prepare(just_began=just_began)
-  
-      update_bottom_label(label, 'Listening...')
-      root.update()
-      listen(audio_file=audio_file_pth)
-  
-      update_bottom_label(label, 'Thinking...')
-      root.update()
-      user_input = transcribe(audio_file=audio_file_pth)
-  ```
+#### Visual Studio Code Interface
+- **Panels**
+  - Editor displaying `main.py`
+  - PROBLEMS and TERMINAL panels on the right
+- **Pop-up Window**
+  - Title: "Note Taker"
+  - Message: "Let me take a look"
+  - Graphic: Circular design
+- **Status Bar**
+  - Indicates file state and system information
 
-#### Right Section (Terminal/Console Output)
-```
-(cuda-env) PS C:\dev\openai_scratch\> & 'c:\Users\aryan\miniconda3\envs\cuda-env\python.exe' 'c:\Users\aryan\.vscode\extensions\ms-python.python-...
-hpad\openscratch\main.py'
-warnings.warn(f"{type
+#### Notes
+- The code is structured for a GUI application using `customtkinter`.
+- The `config` function sets up the main window with specific appearance settings and logging.
+- The `set_main_image` function adds an image to a given frame.
+- The `set_bottom_label` function is incomplete and lacks implementation details.

@@ -108,8 +108,8 @@ def screenshot_response(screenshot_pth, screenshot_text, user_input):
     with open(notes_path, 'a') as notes_file:
         notes_file.write(notes + "\n")
         
-        shutil.copyfile(notes_path, model.resource_path(os.path.join("notes", "notes.md")))
         model.tts('Cleaning up your notes for readability... Almost there')
+        shutil.copyfile(notes_path, model.resource_path(os.path.join("notes", "notes.md")))
 
     os.remove(screenshot_pth)
    # root.after(100, screenshot_response, root, label, screenshot_pth, screenshot_text)  

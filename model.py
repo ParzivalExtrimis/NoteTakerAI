@@ -13,6 +13,7 @@ from pydub.playback import play
 import pyautogui
 from faster_whisper import WhisperModel
 import logging
+from dotenv import dotenv_values
 
 # ANSI escape codes for colors
 
@@ -24,7 +25,9 @@ YELLOW = '\033[93m'
 NEON_GREEN = '\033[92m'
 RESET_COLOR = '\033[0m'
 
-openai.api_key = "sk-proj-9dd8fBkmKQtiwXXPvkbtT3BlbkFJRjglKE0ZQZmCJ0Tovvk1"
+secrets = dotenv_values(".env")
+
+openai.api_key = secrets["OPENAI_API_KEY"]
 client = OpenAI(api_key=openai.api_key)
 
 def resource_path(relative_path):
