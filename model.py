@@ -13,8 +13,10 @@ from pydub.playback import play
 import pyautogui
 from faster_whisper import WhisperModel
 import logging
-from dotenv import dotenv_values
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 # ANSI escape codes for colors
 
 # !!!!!! environment variable KMP_DUPLICATE_LIB_OK has been set ( Unsafe ) to bypass multiple OpenMP runtime instance warning. Set in environment variables section of PC. Check validity later
@@ -25,9 +27,7 @@ YELLOW = '\033[93m'
 NEON_GREEN = '\033[92m'
 RESET_COLOR = '\033[0m'
 
-secrets = dotenv_values(".env")
-
-openai.api_key = secrets["OPENAI_API_KEY"]
+openai.api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai.api_key)
 
 def resource_path(relative_path):
