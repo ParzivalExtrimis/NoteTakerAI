@@ -17,10 +17,9 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-# ANSI escape codes for colors
-
 # !!!!!! environment variable KMP_DUPLICATE_LIB_OK has been set ( Unsafe ) to bypass multiple OpenMP runtime instance warning. Set in environment variables section of PC. Check validity later
 
+# ANSI escape codes for colors
 PINK = '\033[95m'
 CYAN = '\033[96m'
 YELLOW = '\033[93m'
