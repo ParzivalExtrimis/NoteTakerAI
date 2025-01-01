@@ -1,4 +1,4 @@
-﻿name: cuda-env
+﻿name: notetaker-env
 channels:
   - pytorch
   - nvidia
