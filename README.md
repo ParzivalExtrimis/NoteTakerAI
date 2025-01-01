@@ -19,7 +19,7 @@ Automatic note taking app, built with OpenAI's GPT 4o as backend
 
     ```
     conda env create -f dependencies.yml
-    conda activate cuda-env
+    conda activate notetaker-env
     ```
 
 - ### Start 
